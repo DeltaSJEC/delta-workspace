@@ -119,8 +119,12 @@ export default function LoginPage() {
         <div className="glass-card p-8 fade-in">
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-14 h-14 rounded-full bg-[#0f62fe] flex items-center justify-center mb-4 shadow-[0_0_32px_rgba(15,98,254,0.4)]">
-              <span className="material-symbols-outlined filled text-white" style={{ fontSize: 28 }}>bolt</span>
+            <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mb-4 shadow-[0_0_32px_rgba(15,98,254,0.25)] overflow-hidden p-1">
+              <img
+                src="/Delta%20Logo.jpeg"
+                alt="Delta SJEC"
+                className="w-full h-full object-contain"
+              />
             </div>
             <h1 className="text-2xl font-bold text-[#e2e2e2] tracking-tight">Delta SJEC</h1>
             <p className="text-sm text-[#525252] mt-1">Virtual Workspace Portal</p>

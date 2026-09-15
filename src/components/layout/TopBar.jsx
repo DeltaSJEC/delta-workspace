@@ -54,8 +54,12 @@ export function TopBar({ pageTitle }) {
           />
           <aside className="glass-sidebar absolute left-0 top-0 h-full w-72 flex flex-col py-6 px-2">
             <div className="flex items-center gap-3 px-3 mb-6">
-              <div className="w-8 h-8 rounded-full bg-[#0f62fe] flex items-center justify-center">
-                <span className="material-symbols-outlined filled text-white text-[16px]">bolt</span>
+              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden shadow-sm p-0.5">
+                <img
+                  src="/Delta%20Logo.jpeg"
+                  alt="Delta"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <span className="font-bold text-[#e2e2e2] text-sm">Delta SJEC Workspace</span>
               <button

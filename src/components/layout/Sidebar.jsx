@@ -32,8 +32,12 @@ export function Sidebar() {
       {/* Logo / Club Name */}
       <div className="px-5 pt-6 pb-4 border-b border-[rgba(174,198,255,0.1)]">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#0f62fe] flex items-center justify-center overflow-hidden shrink-0">
-            <span className="material-symbols-outlined filled text-white text-[18px]">bolt</span>
+          <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
+            <img
+              src="/Delta%20Logo.jpeg"
+              alt="Delta"
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
             <h1 className="text-sm font-bold text-[#e2e2e2] leading-tight">Delta SJEC</h1>
