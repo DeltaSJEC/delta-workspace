@@ -121,7 +121,7 @@ export default function LoginPage() {
           <div className="flex flex-col items-center mb-8">
             <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mb-4 shadow-[0_0_32px_rgba(15,98,254,0.25)] overflow-hidden p-1">
               <img
-                src="/Delta%20Logo.jpeg"
+                src="/delta-logo.jpeg"
                 alt="Delta SJEC"
                 className="w-full h-full object-contain"
               />

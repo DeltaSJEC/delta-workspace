@@ -1,14 +1,14 @@
-# ── Dependencies ──────────────────────────────────────────────
+# Dependencies
 node_modules/
 .pnp
 .pnp.js
 
-# ── Build output ───────────────────────────────────────────────
+# Build output
 dist/
 dist-ssr/
 build/
 
-# ── Environment variables (NEVER commit these) ─────────────────
+# Environment variables (NEVER commit these)
 .env
 .env.local
 .env.development
@@ -19,7 +19,7 @@ build/
 .env.production.local
 .env.*.local
 
-# ── Logs ───────────────────────────────────────────────────────
+# Logs
 logs/
 *.log
 npm-debug.log*
@@ -27,7 +27,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# ── Editor / OS ────────────────────────────────────────────────
+# Editor / OS
 .vscode/settings.json
 .idea/
 .DS_Store
@@ -38,14 +38,14 @@ Thumbs.db
 *.sln
 *.sw?
 
-# ── Vite ───────────────────────────────────────────────────────
+# Vite
 *.local
 vite.config.js.timestamp-*
 
-# ── Testing ────────────────────────────────────────────────────
+# Testing
 coverage/
 .nyc_output/
 
-# ── Supabase local dev (not used here, just in case) ──────────
+# Supabase local dev (not used here, just in case)
 supabase/.branches/
 supabase/.temp/

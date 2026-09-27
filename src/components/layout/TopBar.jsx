@@ -56,7 +56,7 @@ export function TopBar({ pageTitle }) {
             <div className="flex items-center gap-3 px-3 mb-6">
               <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden shadow-sm p-0.5">
                 <img
-                  src="/Delta%20Logo.jpeg"
+                  src="/delta-logo.jpeg"
                   alt="Delta"
                   className="w-full h-full object-contain"
                 />

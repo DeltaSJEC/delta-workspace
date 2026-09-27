@@ -34,7 +34,7 @@ export function Sidebar() {
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
             <img
-              src="/Delta%20Logo.jpeg"
+              src="/delta-logo.jpeg"
               alt="Delta"
               className="w-full h-full object-contain"
             />
