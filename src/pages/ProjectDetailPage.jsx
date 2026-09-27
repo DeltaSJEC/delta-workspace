@@ -1,19 +1,35 @@
+import { useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { AppShell } from '../components/layout/AppShell'
 import { ProjectFileList } from '../components/projects/ProjectFileList'
 import { CommentList } from '../components/comments/CommentList'
 import { ReactionButton } from '../components/reactions/ReactionButton'
+import { MemberSubmissionUpload } from '../components/projects/MemberSubmissionUpload'
+import { MemberSubmissionsPanel } from '../components/projects/MemberSubmissionsPanel'
 import { Badge } from '../components/ui/Badge'
 import { Spinner } from '../components/ui/Spinner'
 import { useProject } from '../hooks/useProjects'
 import { useAuth } from '../context/AuthContext'
+import { useMemberSubmissions } from '../hooks/useMemberSubmissions'
 import { DEPARTMENT_COLORS } from '../constants/departments'
 import { formatDateTime } from '../utils/dateFormat'
 
 export default function ProjectDetailPage() {
   const { id } = useParams()
-  const { profile, isHead } = useAuth()
+  const { profile, isHead, user } = useAuth()
   const { project, loading, error, refetch } = useProject(id)
+  const {
+    submissions,
+    loading: subsLoading,
+    fetchSubmissions,
+    uploadSubmission,
+    deleteSubmission,
+    getDownloadUrl,
+  } = useMemberSubmissions(id)
+
+  useEffect(() => {
+    if (id) fetchSubmissions()
+  }, [id])
 
   if (loading) {
     return (
@@ -110,6 +126,32 @@ export default function ProjectDetailPage() {
           <div className="glass-card p-6">
             <CommentList projectId={project.id} />
           </div>
+
+          {/* ── Member Submission Upload (members only) ── */}
+          {!isHead && (
+            <div className="glass-card p-6">
+              <MemberSubmissionUpload
+                projectId={project.id}
+                userId={user?.id}
+                onUploaded={async ({ file, note, userId }) => {
+                  const result = await uploadSubmission({ file, note, userId })
+                  return result
+                }}
+              />
+            </div>
+          )}
+
+          {/* ── Member Submissions Panel (heads only) ── */}
+          {isHead && (
+            <div className="glass-card p-6">
+              <MemberSubmissionsPanel
+                submissions={submissions}
+                loading={subsLoading}
+                onDelete={deleteSubmission}
+                onDownload={getDownloadUrl}
+              />
+            </div>
+          )}
         </div>
 
         {/* Sidebar: Files */}

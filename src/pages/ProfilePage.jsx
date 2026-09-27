@@ -136,10 +136,11 @@ export default function ProfilePage() {
               </div>
 
               {/* Stat row */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 {[
                   { icon: 'login', label: 'Total Sessions', value: stats.totalSessions, color: '#c2c6d6' },
                   { icon: 'avg_pace', label: 'Avg. Session', value: formatDuration(stats.avgSeconds), color: '#c2c6d6' },
+                  { icon: 'upload_file', label: 'Submissions', value: projectsLoading ? '…' : projects.length, color: projects.length > 0 ? '#aec6ff' : '#c2c6d6' },
                 ].map(({ icon, label, value, color }) => (
                   <div key={label} style={{
                     background: 'rgba(174,198,255,0.04)',
@@ -234,6 +235,12 @@ export default function ProfilePage() {
                 <YearlyHeatmap
                   dailyMap={stats.dailyMap || {}}
                   yearTotal={stats.yearSessions || 0}
+                  submissionMap={Object.fromEntries(
+                    projects.map(p => [
+                      p.submittedAt ? new Date(p.submittedAt).toISOString().slice(0, 10) : '',
+                      1,
+                    ]).filter(([k]) => k)
+                  )}
                 />
               </div>
 
@@ -284,11 +291,10 @@ export default function ProfilePage() {
                   const targets = proj.target_departments || []
                   const likeCount = proj.reactions?.filter(r => r.type === 'like').length || 0
                   const commentCount = proj.comments?.length || 0
-                  const fileCount = proj.project_files?.length || 0
 
                   return (
                     <Link
-                      key={proj.id}
+                      key={proj.submissionId}
                       to={`/project/${proj.id}`}
                       style={{
                         display: 'block',
@@ -328,33 +334,28 @@ export default function ProfilePage() {
                         </div>
                       )}
 
-                      {/* Title */}
-                      <p style={{ fontSize: '14px', fontWeight: 600, color: '#e2e2e2', marginBottom: '4px', lineHeight: 1.3 }}>
+                      {/* Project Title */}
+                      <p style={{ fontSize: '14px', fontWeight: 600, color: '#e2e2e2', marginBottom: '3px', lineHeight: 1.3 }}>
                         {proj.title}
                       </p>
 
-                      {/* Description snippet */}
-                      <p style={{
-                        fontSize: '12px', color: '#525252', lineHeight: 1.5,
-                        display: '-webkit-box', WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                        marginBottom: '10px',
-                      }}>
-                        {proj.description}
-                      </p>
+                      {/* Submitted file info */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
+                        <span className="material-symbols-outlined text-[#525252]" style={{ fontSize: '12px' }}>attach_file</span>
+                        <span style={{ fontSize: '11px', color: '#525252', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {proj.filename}
+                        </span>
+                        {proj.note && (
+                          <span style={{ fontSize: '11px', color: '#424754', fontStyle: 'italic', marginLeft: '4px' }}>— "{proj.note}"</span>
+                        )}
+                      </div>
 
                       {/* Footer meta */}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '11px', color: '#424754' }}>
-                          {timeAgo(proj.created_at)}
+                          Submitted {timeAgo(proj.submittedAt)}
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          {fileCount > 0 && (
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', color: '#525252' }}>
-                              <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>attach_file</span>
-                              {fileCount}
-                            </span>
-                          )}
                           <span style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', color: '#525252' }}>
                             <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>chat_bubble</span>
                             {commentCount}

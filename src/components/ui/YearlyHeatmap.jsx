@@ -3,10 +3,11 @@
  * Shows the last 52 weeks (364 days) as a grid of coloured cells.
  *
  * Props:
- *   dailyMap  — Record<string, number>  e.g. { '2026-09-01': 3, ... }
- *   yearTotal — number  total sessions in the past year
+ *   dailyMap      — Record<string, number>  login sessions per day
+ *   yearTotal     — number  total sessions in the past year
+ *   submissionMap — Record<string, number>  submissions per day (optional)
  */
-export function YearlyHeatmap({ dailyMap = {}, yearTotal = 0 }) {
+export function YearlyHeatmap({ dailyMap = {}, yearTotal = 0, submissionMap = {} }) {
   // ── Build the 53-week × 7-day grid ──────────────────────────────
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -33,14 +34,16 @@ export function YearlyHeatmap({ dailyMap = {}, yearTotal = 0 }) {
   // Max count for scaling colours
   const maxCount = Math.max(...Object.values(dailyMap), 1)
 
-  // ── Colour helper (4 levels like GitHub) ────────────────────────
-  function cellColor(count) {
-    if (!count) return '#161b22'        // empty
+  // ── Colour helper ────────────────────────────────────────
+  // Blue = submission day, Green shades = login activity, dark = empty
+  function cellColor(count, hasSub) {
+    if (hasSub) return '#0f62fe'          // submission highlight (blue)
+    if (!count) return '#161b22'          // empty
     const ratio = count / maxCount
-    if (ratio < 0.25) return '#0e4429' // level 1
-    if (ratio < 0.5)  return '#006d32' // level 2
-    if (ratio < 0.75) return '#26a641' // level 3
-    return '#39d353'                    // level 4 (brightest)
+    if (ratio < 0.25) return '#0e4429'   // level 1
+    if (ratio < 0.5)  return '#006d32'   // level 2
+    if (ratio < 0.75) return '#26a641'   // level 3
+    return '#39d353'                      // level 4 (brightest)
   }
 
   // ── Month labels (show label at the first column of a new month) ─
@@ -143,11 +146,14 @@ export function YearlyHeatmap({ dailyMap = {}, yearTotal = 0 }) {
                 <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px` }}>
                   {week.map((day, di) => {
                     const isFuture = day.date > today
+                    const hasSub = !!submissionMap[day.dateStr]
+                    const subCount = submissionMap[day.dateStr] || 0
                     const label = isFuture
                       ? ''
-                      : day.count === 0
-                        ? `No sessions on ${day.dateStr}`
-                        : `${day.count} session${day.count !== 1 ? 's' : ''} on ${day.dateStr}`
+                      : [
+                          day.count > 0 ? `${day.count} session${day.count !== 1 ? 's' : ''}` : null,
+                          subCount > 0  ? `${subCount} submission${subCount !== 1 ? 's' : ''}` : null,
+                        ].filter(Boolean).join(' · ') || `No activity on ${day.dateStr}`
                     return (
                       <div
                         key={di}
@@ -156,8 +162,8 @@ export function YearlyHeatmap({ dailyMap = {}, yearTotal = 0 }) {
                           width: `${CELL}px`,
                           height: `${CELL}px`,
                           borderRadius: '2px',
-                          backgroundColor: isFuture ? 'transparent' : cellColor(day.count),
-                          cursor: day.count > 0 ? 'default' : undefined,
+                          backgroundColor: isFuture ? 'transparent' : cellColor(day.count, hasSub),
+                          cursor: (day.count > 0 || hasSub) ? 'default' : undefined,
                           transition: 'background-color 0.15s',
                           border: '1px solid rgba(255,255,255,0.04)',
                         }}
@@ -174,7 +180,7 @@ export function YearlyHeatmap({ dailyMap = {}, yearTotal = 0 }) {
       {/* Legend */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-        gap: '4px', marginTop: '8px',
+        gap: '4px', marginTop: '8px', flexWrap: 'wrap',
       }}>
         <span style={{ fontSize: '10px', color: '#525252', marginRight: '4px' }}>Less</span>
         {['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'].map(c => (
@@ -185,6 +191,9 @@ export function YearlyHeatmap({ dailyMap = {}, yearTotal = 0 }) {
           }} />
         ))}
         <span style={{ fontSize: '10px', color: '#525252', marginLeft: '4px' }}>More</span>
+        <div style={{ width: '1px', height: '12px', background: 'rgba(174,198,255,0.12)', margin: '0 6px' }} />
+        <div style={{ width: `${CELL}px`, height: `${CELL}px`, borderRadius: '2px', backgroundColor: '#0f62fe', border: '1px solid rgba(255,255,255,0.04)' }} />
+        <span style={{ fontSize: '10px', color: '#525252', marginLeft: '4px' }}>Submission</span>
       </div>
     </div>
   )
