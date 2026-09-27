@@ -2,8 +2,7 @@ import { useState, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 /**
- * Fetches workspace performance (total time spent) for a given user.
- * Sums all completed session duration_seconds from login_sessions.
+ * Fetches workspace performance (total time + yearly daily activity) for a given user.
  */
 export function usePerformance() {
   const [stats, setStats] = useState(null)
@@ -16,7 +15,10 @@ export function usePerformance() {
     setError(null)
 
     try {
-      // Fetch all sessions for this user
+      // Fetch all sessions for this user (up to last 365 days is enough for heatmap)
+      const yearAgo = new Date()
+      yearAgo.setFullYear(yearAgo.getFullYear() - 1)
+
       const { data, error: fetchError } = await supabase
         .from('login_sessions')
         .select('duration_seconds, login_time, logout_time')
@@ -42,17 +44,27 @@ export function usePerformance() {
       // Last seen (most recent login)
       const lastSeen = sessions.length > 0 ? sessions[0].login_time : null
 
-      // Sessions in the past 7 days
-      const oneWeekAgo = new Date()
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-      const recentSessions = sessions.filter(s => new Date(s.login_time) >= oneWeekAgo).length
+      // Sessions in past year — group by YYYY-MM-DD
+      const oneYearAgo = new Date()
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
+
+      /** @type {Record<string, number>} date string → session count */
+      const dailyMap = {}
+      sessions.forEach(s => {
+        const d = new Date(s.login_time)
+        if (d >= oneYearAgo) {
+          const key = d.toISOString().slice(0, 10) // 'YYYY-MM-DD'
+          dailyMap[key] = (dailyMap[key] || 0) + 1
+        }
+      })
 
       setStats({
         totalSessions,
         totalSeconds,
         avgSeconds,
         lastSeen,
-        recentSessions,
+        dailyMap,           // for heatmap
+        yearSessions: Object.values(dailyMap).reduce((a, b) => a + b, 0),
       })
     } catch (err) {
       setError(err.message)

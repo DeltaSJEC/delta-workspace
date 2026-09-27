@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext'
 import { formatDate, formatDuration, timeAgo } from '../utils/dateFormat'
 import { usePerformance } from '../hooks/usePerformance'
 import { useUserProjects } from '../hooks/useUserProjects'
+import { YearlyHeatmap } from '../components/ui/YearlyHeatmap'
 import { DEPARTMENT_COLORS } from '../constants/departments'
 import toast from 'react-hot-toast'
 
@@ -135,15 +136,10 @@ export default function ProfilePage() {
               </div>
 
               {/* Stat row */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: 'login', label: 'Total Sessions', value: stats.totalSessions, color: '#c2c6d6' },
                   { icon: 'avg_pace', label: 'Avg. Session', value: formatDuration(stats.avgSeconds), color: '#c2c6d6' },
-                  {
-                    icon: 'date_range', label: 'This Week',
-                    value: `${stats.recentSessions} session${stats.recentSessions !== 1 ? 's' : ''}`,
-                    color: stats.recentSessions > 0 ? '#42be65' : '#525252',
-                  },
                 ].map(({ icon, label, value, color }) => (
                   <div key={label} style={{
                     background: 'rgba(174,198,255,0.04)',
@@ -159,26 +155,18 @@ export default function ProfilePage() {
                 ))}
               </div>
 
-              {/* Progress bar */}
-              {stats.totalSeconds > 0 && (() => {
-                const weekSeconds = Math.min(stats.recentSessions * stats.avgSeconds, stats.totalSeconds)
-                const pct = Math.round((weekSeconds / stats.totalSeconds) * 100)
-                return (
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '11px', color: '#525252' }}>This week's contribution</span>
-                      <span style={{ fontSize: '11px', color: '#8c909f', fontWeight: 600 }}>{pct}%</span>
-                    </div>
-                    <div style={{ height: '4px', background: 'rgba(174,198,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                      <div style={{
-                        height: '100%', width: `${pct}%`,
-                        background: 'linear-gradient(90deg, #0f62fe, #aec6ff)',
-                        borderRadius: '2px', transition: 'width 0.6s ease',
-                      }} />
-                    </div>
-                  </div>
-                )
-              })()}
+              {/* Yearly contribution heatmap */}
+              <div style={{
+                background: 'rgba(174,198,255,0.02)',
+                border: '1px solid rgba(174,198,255,0.09)',
+                borderRadius: '4px',
+                padding: '16px',
+              }}>
+                <YearlyHeatmap
+                  dailyMap={stats.dailyMap || {}}
+                  yearTotal={stats.yearSessions || 0}
+                />
+              </div>
             </div>
           ) : (
             <p style={{ fontSize: '13px', color: '#525252', textAlign: 'center', padding: '16px 0 24px' }}>
