@@ -1,18 +1,27 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AppShell } from '../components/layout/AppShell'
 import { Badge } from '../components/ui/Badge'
 import { Spinner } from '../components/ui/Spinner'
 import { useAuth } from '../context/AuthContext'
-import { formatDate } from '../utils/dateFormat'
+import { formatDate, formatDuration, timeAgo } from '../utils/dateFormat'
+import { usePerformance } from '../hooks/usePerformance'
 import toast from 'react-hot-toast'
 
 export default function ProfilePage() {
-  const { profile, changePassword } = useAuth()
+  const { profile, user, changePassword } = useAuth()
   const [currentPw, setCurrentPw] = useState('')
   const [newPw, setNewPw] = useState('')
   const [confirmPw, setConfirmPw] = useState('')
   const [changingPw, setChangingPw] = useState(false)
   const [showPwForm, setShowPwForm] = useState(false)
+
+  const { stats, loading: statsLoading, fetchPerformance } = usePerformance()
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchPerformance(user.id)
+    }
+  }, [user?.id])
 
   async function handleChangePassword(e) {
     e.preventDefault()
@@ -75,6 +84,138 @@ export default function ProfilePage() {
               </div>
             ))}
           </dl>
+        </div>
+
+        {/* Performance */}
+        <div className="glass-card p-6 mb-5">
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-sm font-semibold text-[#8c909f] uppercase tracking-wider">Performance</h3>
+            <span className="material-symbols-outlined text-[15px] text-[#8c909f]">bar_chart</span>
+          </div>
+
+          {statsLoading ? (
+            <div className="flex justify-center py-6">
+              <Spinner size="md" />
+            </div>
+          ) : stats ? (
+            <div className="flex flex-col gap-4">
+              {/* Total time — hero stat */}
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, rgba(15,98,254,0.18) 0%, rgba(174,198,255,0.07) 100%)',
+                  border: '1px solid rgba(174,198,255,0.18)',
+                  borderRadius: '4px',
+                  padding: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                }}
+              >
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '50%',
+                    background: 'rgba(15,98,254,0.22)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <span className="material-symbols-outlined text-[#aec6ff]" style={{ fontSize: '22px' }}>schedule</span>
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', color: '#8c909f', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Total Workspace Time
+                  </p>
+                  <p style={{ fontSize: '26px', fontWeight: 700, color: '#aec6ff', lineHeight: 1 }}>
+                    {formatDuration(stats.totalSeconds)}
+                  </p>
+                  {stats.lastSeen && (
+                    <p style={{ fontSize: '12px', color: '#525252', marginTop: '4px' }}>
+                      Last active {timeAgo(stats.lastSeen)}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Secondary stat row */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  {
+                    icon: 'login',
+                    label: 'Total Sessions',
+                    value: stats.totalSessions,
+                    color: '#c2c6d6',
+                  },
+                  {
+                    icon: 'avg_pace',
+                    label: 'Avg. Session',
+                    value: formatDuration(stats.avgSeconds),
+                    color: '#c2c6d6',
+                  },
+                  {
+                    icon: 'date_range',
+                    label: 'This Week',
+                    value: `${stats.recentSessions} session${stats.recentSessions !== 1 ? 's' : ''}`,
+                    color: stats.recentSessions > 0 ? '#42be65' : '#525252',
+                  },
+                ].map(({ icon, label, value, color }) => (
+                  <div
+                    key={label}
+                    style={{
+                      background: 'rgba(174,198,255,0.04)',
+                      border: '1px solid rgba(174,198,255,0.09)',
+                      borderRadius: '4px',
+                      padding: '14px 12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px',
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-[#424754]" style={{ fontSize: '16px' }}>{icon}</span>
+                    <p style={{ fontSize: '10px', color: '#525252', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                      {label}
+                    </p>
+                    <p style={{ fontSize: '15px', fontWeight: 700, color, lineHeight: 1 }}>
+                      {value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Progress bar: time this week vs all time */}
+              {stats.totalSeconds > 0 && (() => {
+                // Compute this-week seconds ratio (approximated from recentSessions * avgSeconds)
+                const weekSeconds = Math.min(stats.recentSessions * stats.avgSeconds, stats.totalSeconds)
+                const pct = stats.totalSeconds > 0 ? Math.round((weekSeconds / stats.totalSeconds) * 100) : 0
+                return (
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '11px', color: '#525252' }}>This week's contribution</span>
+                      <span style={{ fontSize: '11px', color: '#8c909f', fontWeight: 600 }}>{pct}%</span>
+                    </div>
+                    <div style={{ height: '4px', background: 'rgba(174,198,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          height: '100%',
+                          width: `${pct}%`,
+                          background: 'linear-gradient(90deg, #0f62fe, #aec6ff)',
+                          borderRadius: '2px',
+                          transition: 'width 0.6s ease',
+                        }}
+                      />
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
+          ) : (
+            <p style={{ fontSize: '13px', color: '#525252', textAlign: 'center', padding: '16px 0' }}>
+              No session data available yet.
+            </p>
+          )}
         </div>
 
         {/* Change Password */}
