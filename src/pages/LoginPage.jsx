@@ -119,17 +119,11 @@ export default function LoginPage() {
         <div className="glass-card p-8 fade-in">
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-20 h-20 flex items-center justify-center mb-4 overflow-hidden">
+            <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mb-4 shadow-[0_0_32px_rgba(15,98,254,0.25)] overflow-hidden p-1">
               <img
-                src="/delta-logo.png"
+                src="/delta-logo.jpeg"
                 alt="Delta SJEC"
                 className="w-full h-full object-contain"
-                style={{
-                  mixBlendMode: 'plus-lighter',
-                  filter: 'brightness(1.15) contrast(1.1)',
-                  WebkitMaskImage: 'radial-gradient(ellipse 50% 50% at 50% 50%, black 40%, transparent 100%)',
-                  maskImage: 'radial-gradient(ellipse 50% 50% at 50% 50%, black 40%, transparent 100%)'
-                }}
               />
             </div>
             <h1 className="text-2xl font-bold text-[#e2e2e2] tracking-tight">Delta SJEC</h1>

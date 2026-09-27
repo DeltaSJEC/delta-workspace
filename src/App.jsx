@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { HeadOnlyRoute } from './routes/HeadOnlyRoute'
 
-import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import MemberDashboard from './pages/MemberDashboard'
 import HeadDashboard from './pages/HeadDashboard'
@@ -26,7 +25,6 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public */}
-      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
 
       {/* Smart redirect */}
@@ -62,8 +60,8 @@ function AppRoutes() {
         <ProtectedRoute><HeadOnlyRoute><LoginActivityPage /></HeadOnlyRoute></ProtectedRoute>
       } />
 
-      {/* Catch-all: authenticated users go to dashboard, guests to landing */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
 }

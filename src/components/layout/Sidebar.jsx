@@ -32,17 +32,11 @@ export function Sidebar() {
       {/* Logo / Club Name */}
       <div className="px-5 pt-6 pb-4 border-b border-[rgba(174,198,255,0.1)]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
             <img
-              src="/delta-logo.png"
+              src="/delta-logo.jpeg"
               alt="Delta"
               className="w-full h-full object-contain"
-              style={{
-                mixBlendMode: 'plus-lighter',
-                filter: 'brightness(1.15) contrast(1.1)',
-                WebkitMaskImage: 'radial-gradient(ellipse 50% 50% at 50% 50%, black 40%, transparent 100%)',
-                maskImage: 'radial-gradient(ellipse 50% 50% at 50% 50%, black 40%, transparent 100%)'
-              }}
             />
           </div>
           <div>

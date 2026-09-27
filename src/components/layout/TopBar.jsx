@@ -54,17 +54,11 @@ export function TopBar({ pageTitle }) {
           />
           <aside className="glass-sidebar absolute left-0 top-0 h-full w-72 flex flex-col py-6 px-2">
             <div className="flex items-center gap-3 px-3 mb-6">
-              <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden shadow-sm p-0.5">
                 <img
-                  src="/delta-logo.png"
+                  src="/delta-logo.jpeg"
                   alt="Delta"
                   className="w-full h-full object-contain"
-                  style={{
-                    mixBlendMode: 'plus-lighter',
-                    filter: 'brightness(1.15) contrast(1.1)',
-                    WebkitMaskImage: 'radial-gradient(ellipse 50% 50% at 50% 50%, black 40%, transparent 100%)',
-                    maskImage: 'radial-gradient(ellipse 50% 50% at 50% 50%, black 40%, transparent 100%)'
-                  }}
                 />
               </div>
               <span className="font-bold text-[#e2e2e2] text-sm">Delta SJEC Workspace</span>
