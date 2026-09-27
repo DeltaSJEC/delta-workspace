@@ -45,14 +45,34 @@ export function YearlyHeatmap({ dailyMap = {}, yearTotal = 0 }) {
 
   // ── Month labels (show label at the first column of a new month) ─
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-  const monthLabels = weeks.map((week, wi) => {
+  const monthLabels = weeks.map(() => null)
+  let lastM = -1
+  
+  weeks.forEach((week, wi) => {
     const firstDay = week[0]
-    if (!firstDay) return null
+    if (!firstDay) return
     const m = firstDay.date.getMonth()
-    // Show label if it's the first occurrence of this month in the grid
-    const prev = wi > 0 ? weeks[wi - 1][0]?.date.getMonth() : -1
-    return m !== prev ? MONTHS[m] : null
+    if (m !== lastM) {
+      // Only record if it's a new month compared to previous column
+      if (lastM !== -1 || wi === 0) {
+        monthLabels[wi] = MONTHS[m]
+      }
+      lastM = m
+    }
   })
+
+  // Prevent overlapping text (like "SepOct"):
+  // If two month labels are less than 3 columns (weeks) apart, clear the earlier one.
+  // This typically happens at the very start of the graph with a partial month.
+  let prevIdx = -1
+  for (let i = 0; i < monthLabels.length; i++) {
+    if (monthLabels[i]) {
+      if (prevIdx !== -1 && i - prevIdx < 3) {
+        monthLabels[prevIdx] = null
+      }
+      prevIdx = i
+    }
+  }
 
   const CELL = 11   // cell size px
   const GAP  = 2    // gap px

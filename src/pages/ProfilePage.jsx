@@ -155,6 +155,75 @@ export default function ProfilePage() {
                 ))}
               </div>
 
+              {/* ── Working Streak card ── */}
+              <div style={{
+                background: stats.currentStreak > 0
+                  ? 'linear-gradient(135deg, rgba(255,120,30,0.14) 0%, rgba(255,180,30,0.07) 100%)'
+                  : 'rgba(174,198,255,0.03)',
+                border: stats.currentStreak > 0
+                  ? '1px solid rgba(255,140,30,0.30)'
+                  : '1px solid rgba(174,198,255,0.09)',
+                borderRadius: '4px',
+                padding: '16px 18px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '12px',
+              }}>
+                {/* Left: current streak */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '42px', height: '42px', borderRadius: '50%', flexShrink: 0,
+                    background: stats.currentStreak > 0
+                      ? 'rgba(255,140,30,0.18)'
+                      : 'rgba(174,198,255,0.06)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '22px',
+                  }}>
+                    {stats.currentStreak > 0 ? '🔥' : '💤'}
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '10px', color: '#8c909f', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '3px' }}>
+                      Current Streak
+                    </p>
+                    <p style={{
+                      fontSize: '28px', fontWeight: 800, lineHeight: 1,
+                      color: stats.currentStreak > 0 ? '#ff8c1a' : '#424754',
+                    }}>
+                      {stats.currentStreak}
+                      <span style={{ fontSize: '13px', fontWeight: 500, color: '#8c909f', marginLeft: '5px' }}>
+                        day{stats.currentStreak !== 1 ? 's' : ''}
+                      </span>
+                    </p>
+                    <p style={{ fontSize: '11px', color: '#525252', marginTop: '3px' }}>
+                      {stats.currentStreak === 0
+                        ? 'Log in today to start a streak!'
+                        : stats.currentStreak === 1
+                          ? 'Keep it up — come back tomorrow!'
+                          : `${stats.currentStreak} consecutive days active`}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right: longest streak */}
+                <div style={{
+                  textAlign: 'right', flexShrink: 0,
+                  paddingLeft: '16px',
+                  borderLeft: '1px solid rgba(174,198,255,0.08)',
+                }}>
+                  <p style={{ fontSize: '10px', color: '#525252', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '3px' }}>
+                    Best
+                  </p>
+                  <p style={{ fontSize: '22px', fontWeight: 800, color: '#c2c6d6', lineHeight: 1 }}>
+                    {stats.longestStreak}
+                    <span style={{ fontSize: '12px', fontWeight: 500, color: '#525252', marginLeft: '4px' }}>
+                      day{stats.longestStreak !== 1 ? 's' : ''}
+                    </span>
+                  </p>
+                  <p style={{ fontSize: '10px', color: '#424754', marginTop: '3px' }}>all-time</p>
+                </div>
+              </div>
+
               {/* Yearly contribution heatmap */}
               <div style={{
                 background: 'rgba(174,198,255,0.02)',
@@ -167,6 +236,7 @@ export default function ProfilePage() {
                   yearTotal={stats.yearSessions || 0}
                 />
               </div>
+
             </div>
           ) : (
             <p style={{ fontSize: '13px', color: '#525252', textAlign: 'center', padding: '16px 0 24px' }}>
