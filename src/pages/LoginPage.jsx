@@ -13,10 +13,11 @@ function StarCanvas() {
     let w, h, stars = [], animId
     const mouse = { x: 0, y: 0, tx: 0, ty: 0 }
 
-    window.addEventListener('mousemove', e => {
+    function handleMouseMove(e) {
       mouse.tx = (e.clientX - w / 2) * 0.04
       mouse.ty = (e.clientY - h / 2) * 0.04
-    })
+    }
+    window.addEventListener('mousemove', handleMouseMove)
 
     function initStars() {
       stars = []
@@ -69,7 +70,7 @@ function StarCanvas() {
 
     window.addEventListener('resize', resize)
     resize(); draw()
-    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize) }
+    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize); window.removeEventListener('mousemove', handleMouseMove) }
   }, [])
 
   return <canvas ref={canvasRef} id="star-canvas" />

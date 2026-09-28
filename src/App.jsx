@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { HeadOnlyRoute } from './routes/HeadOnlyRoute'
+import { ErrorBoundary } from './components/ui/ErrorBoundary'
 
 import LoginPage from './pages/LoginPage'
 import MemberDashboard from './pages/MemberDashboard'
@@ -68,24 +69,26 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: '#1a1c1c',
-              color: '#e2e2e2',
-              border: '1px solid rgba(174,198,255,0.15)',
-              fontFamily: 'IBM Plex Sans, sans-serif',
-              fontSize: '14px',
-            },
-            success: { iconTheme: { primary: '#64dcb4', secondary: '#1a1c1c' } },
-            error: { iconTheme: { primary: '#fa4d56', secondary: '#1a1c1c' } },
-          }}
-        />
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: '#1a1c1c',
+                color: '#e2e2e2',
+                border: '1px solid rgba(174,198,255,0.15)',
+                fontFamily: 'IBM Plex Sans, sans-serif',
+                fontSize: '14px',
+              },
+              success: { iconTheme: { primary: '#64dcb4', secondary: '#1a1c1c' } },
+              error: { iconTheme: { primary: '#fa4d56', secondary: '#1a1c1c' } },
+            }}
+          />
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }

@@ -108,9 +108,21 @@ export function AuthProvider({ children }) {
       }
     })
 
+    // Log logout attempt when the browser tab/window is closed
+    function handleBeforeUnload() {
+      if (!currentSessionRowId.current) return
+      // Use sendBeacon for reliable delivery during page unload
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/login_sessions?id=eq.${currentSessionRowId.current}`
+      const logoutTime = new Date().toISOString()
+      const body = JSON.stringify({ logout_time: logoutTime })
+      navigator.sendBeacon?.(url, new Blob([body], { type: 'application/json' }))
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
     return () => {
       mounted = false
       subscription.unsubscribe()
+      window.removeEventListener('beforeunload', handleBeforeUnload)
     }
   }, [])
 

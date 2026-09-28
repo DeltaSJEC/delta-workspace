@@ -1,26 +1,12 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { Badge } from '../ui/Badge'
-
-const navItems = [
-  { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
-  { to: '/announcements', icon: 'campaign', label: 'Announcements' },
-  { to: '/profile', icon: 'account_circle', label: 'Profile' },
-]
-
-const headNavItems = [
-  { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
-  { to: '/announcements', icon: 'campaign', label: 'Announcements' },
-  { to: '/create-project', icon: 'add_box', label: 'New Project' },
-  { to: '/create-announcement', icon: 'edit_square', label: 'New Announcement' },
-  { to: '/login-activity', icon: 'manage_accounts', label: 'Login Activity' },
-  { to: '/profile', icon: 'account_circle', label: 'Profile' },
-]
+import { NAV_ITEMS, HEAD_NAV_ITEMS } from '../../constants/navigation'
 
 export function Sidebar() {
   const { profile, logout, isHead } = useAuth()
   const navigate = useNavigate()
-  const items = isHead ? headNavItems : navItems
+  const items = isHead ? HEAD_NAV_ITEMS : NAV_ITEMS
 
   async function handleLogout() {
     await logout()

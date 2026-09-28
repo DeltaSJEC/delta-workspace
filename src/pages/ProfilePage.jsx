@@ -26,7 +26,7 @@ export default function ProfilePage() {
       fetchPerformance(user.id)
       fetchUserProjects(user.id)
     }
-  }, [user?.id])
+  }, [user?.id, fetchPerformance, fetchUserProjects])
 
   async function handleChangePassword(e) {
     e.preventDefault()

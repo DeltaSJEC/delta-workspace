@@ -29,7 +29,7 @@ export default function ProjectDetailPage() {
 
   useEffect(() => {
     if (id) fetchSubmissions()
-  }, [id])
+  }, [id, fetchSubmissions])
 
   if (loading) {
     return (

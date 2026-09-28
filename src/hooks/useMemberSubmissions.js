@@ -53,7 +53,6 @@ export function useMemberSubmissions(projectId) {
     setError(null)
     try {
       // 1. Upload to storage
-      const ext = file.name.split('.').pop()
       const storagePath = `${projectId}/${userId}/${Date.now()}_${file.name}`
 
       const { error: storageErr } = await supabase.storage

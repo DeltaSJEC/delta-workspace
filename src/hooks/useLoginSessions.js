@@ -27,7 +27,7 @@ export function useLoginSessions() {
       `, { count: 'exact' })
 
     if (department) {
-      query = query.eq('users.department', department)
+      query = query.eq('user.department', department)
     }
     if (dateFrom) {
       query = query.gte('login_time', dateFrom)

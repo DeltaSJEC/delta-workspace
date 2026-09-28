@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { DEPARTMENT_COLORS } from '../../constants/departments'
 import { timeAgo } from '../../utils/dateFormat'
 import { useAuth } from '../../context/AuthContext'

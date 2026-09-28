@@ -12,7 +12,6 @@ export default function MemberDashboard() {
   const { projects, loading: pLoading, error: pError, refetch: refetchProjects } = useProjects()
   const { announcements, loading: aLoading } = useAnnouncements()
 
-  const pinned = announcements.filter(a => a.pinned).slice(0, 3)
   const recent = announcements.slice(0, 5)
 
   return (

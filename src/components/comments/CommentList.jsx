@@ -85,7 +85,7 @@ export function CommentList({ projectId }) {
       ) : (
         <div className="flex flex-col gap-4">
           {comments.map(comment => (
-            <div key={comment.id} className="flex items-start gap-3 fade-in">
+            <div key={comment.id} className="flex items-start gap-3 fade-in group">
               <div className="w-7 h-7 rounded-full bg-[rgba(174,198,255,0.12)] flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-[#aec6ff] text-[11px] font-bold uppercase">
                   {comment.user?.name?.[0] || '?'}
