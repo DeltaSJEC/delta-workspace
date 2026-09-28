@@ -79,7 +79,7 @@ The workspace centralises all of this: Heads post projects and announcements tar
 |---|---|---|
 | `VITE_SUPABASE_URL` | Browser (Supabase JS client) | Set in Vercel project settings |
 | `VITE_SUPABASE_ANON_KEY` | Browser (Supabase JS client) | Public key — safe to expose |
-| `VITE_SUPABASE_SERVICE_ROLE_KEY` | Node scripts only (seed, migrate) | **Never deploy to frontend** |
+| `SUPABASE_SERVICE_ROLE_KEY` | Node scripts only (seed) | **Never deploy to frontend** |
 
 `.env` is in `.gitignore`. Only `.env.example` (no values) is committed.
 
@@ -476,6 +476,7 @@ submissionMap: Record<string, number>  // 'YYYY-MM-DD' → submission count (opt
 | `002_rls_policies.sql` | RLS enable + all policies + helper functions |
 | `003_storage.sql` | `project-files` bucket + storage RLS policies |
 | `004_member_submissions.sql` | `member_submissions` table + RLS + `member-submissions` bucket |
+| `005_security_hardening.sql` | Privilege, storage, validation, and session-integrity hardening |
 
 > Run migrations in **Supabase SQL Editor** in order. All are idempotent (`IF NOT EXISTS` / `ON CONFLICT DO NOTHING`).
 
@@ -485,8 +486,7 @@ submissionMap: Record<string, number>  // 'YYYY-MM-DD' → submission count (opt
 
 | Script | Command | Notes |
 |---|---|---|
-| `scripts/seed-users.js` | `npm run seed` | Creates `test_head` and `test_member` via Supabase Admin API. Requires `VITE_SUPABASE_SERVICE_ROLE_KEY` in `.env`. |
-| `scripts/run-migrations.js` | `npm run migrate` | Attempts to run SQL via REST API. May fail without a Supabase PAT; use SQL Editor instead. |
+| `scripts/seed-users.js` | `npm run seed` | Creates `test_head` and `test_member` via Supabase Admin API. Requires `SUPABASE_SERVICE_ROLE_KEY` in `.env`. |
 
 ---
 
@@ -515,7 +515,6 @@ ALL_DEPARTMENTS_VALUE = 'all'
 | Supabase free-tier auto-pause | Project pauses after ~7 days inactivity; must be manually resumed from dashboard |
 | No automated backups | Free tier; manual Supabase dashboard export required |
 | Storage quota | 1 GB total on free tier |
-| Migration runner (`npm run migrate`) | Requires a Supabase PAT for Management API; simpler to run migrations manually in SQL Editor |
 | No email/push notifications | Real-time only applies when user is active in the app |
 | No soft-delete | Files and records permanently deleted immediately |
 

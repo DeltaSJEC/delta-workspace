@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react'
 import { formatFileSize } from '../../utils/fileHelpers'
+import { UPLOAD_ACCEPT, validateUploadFile } from '../../constants/uploads'
+import toast from 'react-hot-toast'
 
 export function FileUploadZone({ files, onChange }) {
   const [dragOver, setDragOver] = useState(false)
@@ -7,6 +9,11 @@ export function FileUploadZone({ files, onChange }) {
 
   function handleFiles(newFiles) {
     const list = Array.from(newFiles)
+    const invalidFile = list.find(file => validateUploadFile(file))
+    if (invalidFile) {
+      toast.error(`${invalidFile.name}: ${validateUploadFile(invalidFile)}`)
+      return
+    }
     onChange(prev => {
       const existing = prev.map(f => f.name)
       const unique = list.filter(f => !existing.includes(f.name))
@@ -38,6 +45,7 @@ export function FileUploadZone({ files, onChange }) {
           ref={inputRef}
           type="file"
           multiple
+          accept={UPLOAD_ACCEPT}
           className="hidden"
           onChange={e => handleFiles(e.target.files)}
         />

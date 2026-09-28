@@ -41,3 +41,9 @@ export function buildStoragePath(projectId, filename) {
   const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '_')
   return `${projectId}/${timestamp}_${safeName}`
 }
+
+export function buildMemberSubmissionPath(projectId, userId, filename) {
+  const timestamp = Date.now()
+  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '_')
+  return `${projectId}/${userId}/${timestamp}_${safeName}`
+}

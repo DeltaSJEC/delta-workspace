@@ -66,7 +66,7 @@ Edit `.env` and fill in your Supabase project details:
 ```env
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your_anon_public_key_here
-VITE_SUPABASE_SERVICE_ROLE_KEY=your_service_role_secret_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_secret_key_here
 ```
 
 > ⚠️ The `SERVICE_ROLE_KEY` is only used by the local seed/migration scripts — **never expose it in a deployed frontend**.
@@ -80,6 +80,7 @@ supabase/migrations/001_initial_schema.sql   ← tables + trigger
 supabase/migrations/002_rls_policies.sql     ← Row Level Security
 supabase/migrations/003_storage.sql          ← project-files bucket
 supabase/migrations/004_member_submissions.sql ← member submissions
+supabase/migrations/005_security_hardening.sql ← RLS, storage, and validation hardening
 ```
 
 ### 4. Seed test accounts
@@ -115,7 +116,6 @@ Open [http://localhost:5173](http://localhost:5173)
 | `npm run build` | Build for production |
 | `npm run preview` | Preview production build locally |
 | `npm run lint` | Run ESLint |
-| `npm run migrate` | Run migrations via REST API (requires PAT) |
 | `npm run seed` | Create test user accounts in Supabase Auth |
 
 ---
@@ -160,11 +160,10 @@ delta-workspace/
 │   ├── routes/              # ProtectedRoute, HeadOnlyRoute
 │   └── utils/               # dateFormat.js, fileHelpers.js, roleHelpers.js
 ├── supabase/
-│   ├── migrations/          # SQL migration files (001–004)
+│   ├── migrations/          # SQL migration files (001–005)
 │   └── seed.sql             # Reference seed data
 ├── scripts/
 │   ├── seed-users.js        # Creates auth accounts via Supabase Admin API
-│   └── run-migrations.js    # Migration runner script
 ├── .env.example             # Template env file (no secrets)
 ├── documentation.md         # Full project documentation
 ├── CONTEXT.md               # Broader project context for AI/developer reference
@@ -196,7 +195,7 @@ The four Delta departments, each with colour-coded badges:
    - `VITE_SUPABASE_ANON_KEY`
 3. Vercel will run `vite build` automatically on every push to `main`
 
-> The `VITE_SUPABASE_SERVICE_ROLE_KEY` should **not** be set in Vercel — it is only needed locally for seeding.
+> The `SUPABASE_SERVICE_ROLE_KEY` should **not** be set in Vercel — it is only needed locally for seeding.
 
 ---
 

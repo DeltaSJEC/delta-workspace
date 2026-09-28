@@ -64,15 +64,33 @@ async function main() {
       },
     })
 
+    let userId = data?.user?.id
     if (error) {
       if (error.message.includes('already been registered')) {
         console.log('⏭️  already exists')
+        const { data: users, error: usersError } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 })
+        if (usersError) throw usersError
+        userId = users.users.find(existingUser => existingUser.email === u.email)?.id
       } else {
         console.log(`❌  ${error.message}`)
+        continue
       }
-    } else {
-      console.log(`✅  (${u.role})`)
     }
+
+    if (!userId) throw new Error(`Could not find the Auth user for ${u.email}`)
+
+    const { error: profileError } = await supabase
+      .from('users')
+      .update({
+        name: u.name,
+        role: u.role,
+        department: u.department,
+        is_club_wide: u.is_club_wide,
+      })
+      .eq('id', userId)
+
+    if (profileError) throw profileError
+    if (!error) console.log(`✅  (${u.role})`)
   }
 
   console.log('\n✨  Seeding complete!')

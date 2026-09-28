@@ -20,7 +20,7 @@ export default function LoginActivityPage() {
 
   useEffect(() => {
     fetchSessions({ department: dept || null, dateFrom: dateFrom || null, dateTo: dateTo || null, page, pageSize: PAGE_SIZE, sortField, sortDir })
-  }, [dept, dateFrom, dateTo, page, sortField, sortDir])
+  }, [dept, dateFrom, dateTo, page, sortField, sortDir, fetchSessions])
 
   function toggleSort(field) {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')

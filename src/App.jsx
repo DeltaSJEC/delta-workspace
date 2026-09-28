@@ -1,19 +1,20 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { HeadOnlyRoute } from './routes/HeadOnlyRoute'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 
-import LoginPage from './pages/LoginPage'
-import MemberDashboard from './pages/MemberDashboard'
-import HeadDashboard from './pages/HeadDashboard'
-import ProjectDetailPage from './pages/ProjectDetailPage'
-import AnnouncementsPage from './pages/AnnouncementsPage'
-import CreateProjectPage from './pages/CreateProjectPage'
-import CreateAnnouncementPage from './pages/CreateAnnouncementPage'
-import LoginActivityPage from './pages/LoginActivityPage'
-import ProfilePage from './pages/ProfilePage'
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const MemberDashboard = lazy(() => import('./pages/MemberDashboard'))
+const HeadDashboard = lazy(() => import('./pages/HeadDashboard'))
+const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage'))
+const AnnouncementsPage = lazy(() => import('./pages/AnnouncementsPage'))
+const CreateProjectPage = lazy(() => import('./pages/CreateProjectPage'))
+const CreateAnnouncementPage = lazy(() => import('./pages/CreateAnnouncementPage'))
+const LoginActivityPage = lazy(() => import('./pages/LoginActivityPage'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 
 // Smart dashboard redirect based on role
 function DashboardRedirect() {
@@ -72,7 +73,9 @@ export default function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
+        <Suspense fallback={<div className="min-h-screen bg-[#0c0f0f]" />}>
           <AppRoutes />
+        </Suspense>
           <Toaster
             position="top-right"
             toastOptions={{

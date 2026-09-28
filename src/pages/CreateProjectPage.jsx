@@ -7,6 +7,7 @@ import { Spinner } from '../components/ui/Spinner'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { buildStoragePath } from '../utils/fileHelpers'
+import { validateUploadFile } from '../constants/uploads'
 import toast from 'react-hot-toast'
 
 export default function CreateProjectPage() {
@@ -50,6 +51,8 @@ export default function CreateProjectPage() {
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i]
+          const validationError = validateUploadFile(file)
+          if (validationError) throw new Error(`${file.name}: ${validationError}`)
           setUploadProgress(`Uploading ${i + 1}/${files.length}: ${file.name}`)
           const storagePath = buildStoragePath(project.id, file.name)
 
@@ -57,18 +60,20 @@ export default function CreateProjectPage() {
             .from('project-files')
             .upload(storagePath, file)
 
-          if (storageErr) {
-            toast.error(`Failed to upload ${file.name}`)
-            continue
-          }
+          if (storageErr) throw new Error(`Failed to upload ${file.name}: ${storageErr.message}`)
 
-          await supabase.from('project_files').insert({
+          const { error: fileRecordError } = await supabase.from('project_files').insert({
             project_id: project.id,
             storage_path: storagePath,
             filename: file.name,
             file_type: file.type || 'application/octet-stream',
             size_bytes: file.size,
           })
+          if (fileRecordError) {
+            const { error: rollbackError } = await supabase.storage.from('project-files').remove([storagePath])
+            if (rollbackError) console.error('Could not roll back project file upload:', rollbackError)
+            throw new Error(`Failed to save ${file.name}: ${fileRecordError.message}`)
+          }
         }
       }
 
@@ -116,6 +121,7 @@ export default function CreateProjectPage() {
                 className="carbon-textarea"
                 placeholder="Describe the project, goals, progress, and any relevant details..."
                 rows={6}
+                maxLength={5000}
                 required
               />
             </div>

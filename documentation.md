@@ -672,7 +672,7 @@ This groups files by project, prevents collisions, and keeps the human-readable 
 |---|---|---|
 | `VITE_SUPABASE_URL` | `.env` / Vercel env | Supabase JS client (browser) |
 | `VITE_SUPABASE_ANON_KEY` | `.env` / Vercel env | Supabase JS client (browser) |
-| `VITE_SUPABASE_SERVICE_ROLE_KEY` | `.env` (local only) | Seed + migration scripts (Node) — never deployed |
+| `SUPABASE_SERVICE_ROLE_KEY` | `.env` (local only) | Seed script (Node) — never deployed |
 
 ### 18.2 Local Development
 
@@ -691,6 +691,7 @@ supabase/migrations/001_initial_schema.sql
 supabase/migrations/002_rls_policies.sql
 supabase/migrations/003_storage.sql
 supabase/migrations/004_member_submissions.sql
+supabase/migrations/005_security_hardening.sql
 ```
 
 ### 18.4 Seeding Test Accounts
@@ -714,7 +715,7 @@ npm run seed      # creates test_head@delta.sjec.ac.in and test_member@delta.sje
 
 | Task | How |
 |---|---|
-| Add a new member | Create auth account in Supabase dashboard (Auth → Users → Invite user) with correct metadata; trigger auto-populates `public.users` |
+| Add a new member | Create/invite the Auth account, then set role and department directly in `public.users` using an administrator account. The trigger always creates a member profile. |
 | Update a member's department | Edit the row directly in `public.users` via Supabase dashboard |
 | Apply a schema change | Write a new migration SQL file → run in Supabase SQL Editor → commit the file to repo |
 | Manual DB backup | Supabase dashboard → Settings → Database → Export |

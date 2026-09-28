@@ -21,6 +21,15 @@ export function ProjectCard({ project, onDeleted }) {
   async function handleDelete() {
     if (!confirm('Delete this project? This cannot be undone.')) return
     setDeleting(true)
+    const storagePaths = project.project_files?.map(file => file.storage_path) || []
+    if (storagePaths.length > 0) {
+      const { error: storageError } = await supabase.storage.from('project-files').remove(storagePaths)
+      if (storageError) {
+        toast.error('Failed to delete project attachments')
+        setDeleting(false)
+        return
+      }
+    }
     const { error } = await supabase.from('projects').delete().eq('id', project.id)
     if (error) {
       toast.error('Failed to delete project')

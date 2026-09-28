@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { buildMemberSubmissionPath } from '../utils/fileHelpers'
+import { validateUploadFile } from '../constants/uploads'
 
 /**
  * Hook for member work submissions on a project.
@@ -49,11 +51,14 @@ export function useMemberSubmissions(projectId) {
   const uploadSubmission = useCallback(async ({ file, note, userId }) => {
     if (!file || !projectId || !userId) return
 
+    const validationError = validateUploadFile(file)
+    if (validationError) return { success: false, error: validationError }
+
     setUploading(true)
     setError(null)
     try {
       // 1. Upload to storage
-      const storagePath = `${projectId}/${userId}/${Date.now()}_${file.name}`
+      const storagePath = buildMemberSubmissionPath(projectId, userId, file.name)
 
       const { error: storageErr } = await supabase.storage
         .from('member-submissions')
@@ -69,14 +74,15 @@ export function useMemberSubmissions(projectId) {
           submitted_by: userId,
           storage_path: storagePath,
           filename: file.name,
-          file_type: file.type || `application/${ext}`,
+          file_type: file.type,
           size_bytes: file.size,
           note: note?.trim() || '',
         })
 
       if (insertErr) {
         // Rollback storage upload
-        await supabase.storage.from('member-submissions').remove([storagePath])
+        const { error: rollbackError } = await supabase.storage.from('member-submissions').remove([storagePath])
+        if (rollbackError) console.error('Could not roll back submission upload:', rollbackError)
         throw new Error(insertErr.message)
       }
 
@@ -94,9 +100,11 @@ export function useMemberSubmissions(projectId) {
   const deleteSubmission = useCallback(async (submission) => {
     try {
       // Remove from storage
-      await supabase.storage
+      const { error: storageError } = await supabase.storage
         .from('member-submissions')
         .remove([submission.storage_path])
+
+      if (storageError) throw new Error(storageError.message)
 
       // Remove metadata
       const { error: delErr } = await supabase
