@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { getMemberDetails } from '../constants/members'
 
 const AuthContext = createContext(null)
 
@@ -14,7 +15,7 @@ export function AuthProvider({ children }) {
   // ────────────────────────────────────────────────────────────────
   // Fetch public profile from users table
   // ────────────────────────────────────────────────────────────────
-  async function fetchProfile(userId) {
+  async function fetchProfile(userId, authUser) {
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -24,7 +25,17 @@ export function AuthProvider({ children }) {
       console.error('Error fetching profile:', error)
       return null
     }
-    return data
+
+    const memberMeta = getMemberDetails(data.email) || {}
+    const authMeta = authUser?.user_metadata || {}
+
+    return {
+      ...data,
+      name: memberMeta.name || data.name,
+      role_title: memberMeta.role_title || authMeta.role_title || (data.role === 'head' ? 'Head' : 'Member'),
+      branch: memberMeta.branch || authMeta.branch || '',
+      department: memberMeta.department || data.department,
+    }
   }
 
   // ────────────────────────────────────────────────────────────────
@@ -82,7 +93,7 @@ export function AuthProvider({ children }) {
       if (existingSession) {
         setSession(existingSession)
         setUser(existingSession.user)
-        const p = await fetchProfile(existingSession.user.id)
+        const p = await fetchProfile(existingSession.user.id, existingSession.user)
         if (mounted) setProfile(p)
       }
       if (mounted) setLoading(false)
@@ -96,7 +107,7 @@ export function AuthProvider({ children }) {
       setUser(newSession?.user ?? null)
 
       if (newSession?.user) {
-        const p = await fetchProfile(newSession.user.id)
+        const p = await fetchProfile(newSession.user.id, newSession.user)
         if (mounted) setProfile(p)
       } else {
         setProfile(null)
@@ -115,18 +126,28 @@ export function AuthProvider({ children }) {
   }, [])
 
   // ────────────────────────────────────────────────────────────────
-  // Login
+  // Login (supports Login ID or Email)
   // ────────────────────────────────────────────────────────────────
-  async function login(email, password) {
+  async function login(identifier, password) {
     setError(null)
+    const trimmed = identifier.trim()
+    const email = trimmed.includes('@')
+      ? trimmed.toLowerCase()
+      : `${trimmed.toLowerCase()}@delta.sjec.ac.in`
+
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
     if (authError) {
       setError(authError.message)
       throw authError
     }
+
+    // Immediately fetch profile for fast routing
+    const p = await fetchProfile(data.user.id, data.user)
+    setProfile(p)
+
     // Log the session
     await logLogin(data.user.id)
-    return data
+    return { ...data, profile: p }
   }
 
   // ────────────────────────────────────────────────────────────────

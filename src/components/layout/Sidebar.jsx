@@ -43,10 +43,12 @@ export function Sidebar() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-[#e2e2e2] truncate">{profile.name}</p>
-              <p className="text-xs text-[#525252] truncate">{profile.department}</p>
+              <p className="text-xs text-[#525252] truncate font-mono">
+                {profile.department}{profile.branch ? ` (${profile.branch})` : ''} · {profile.email?.split('@')[0]?.toUpperCase()}
+              </p>
             </div>
             <Badge variant={isHead ? 'head' : 'member'}>
-              {isHead ? 'Head' : 'Member'}
+              {profile.role_title || (isHead ? 'Head' : 'Member')}
             </Badge>
           </div>
         </div>

@@ -1,18 +1,20 @@
 import { useState, useRef } from 'react'
 import { formatFileSize } from '../../utils/fileHelpers'
-import { UPLOAD_ACCEPT, validateUploadFile } from '../../constants/uploads'
+import { UPLOAD_ACCEPT, validateUploadFileAsync } from '../../constants/uploads'
 import toast from 'react-hot-toast'
 
 export function FileUploadZone({ files, onChange }) {
   const [dragOver, setDragOver] = useState(false)
   const inputRef = useRef(null)
 
-  function handleFiles(newFiles) {
+  async function handleFiles(newFiles) {
     const list = Array.from(newFiles)
-    const invalidFile = list.find(file => validateUploadFile(file))
-    if (invalidFile) {
-      toast.error(`${invalidFile.name}: ${validateUploadFile(invalidFile)}`)
-      return
+    for (const file of list) {
+      const errorMsg = await validateUploadFileAsync(file)
+      if (errorMsg) {
+        toast.error(`${file.name}: ${errorMsg}`)
+        return
+      }
     }
     onChange(prev => {
       const existing = prev.map(f => f.name)

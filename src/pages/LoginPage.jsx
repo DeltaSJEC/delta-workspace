@@ -77,10 +77,10 @@ function StarCanvas() {
 }
 
 export default function LoginPage() {
-  const { login, session, loading } = useAuth()
+  const { login, session, profile, loading } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [email, setEmail] = useState('')
+  const [loginId, setLoginId] = useState('')
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -88,17 +88,34 @@ export default function LoginPage() {
   const from = location.state?.from?.pathname || '/dashboard'
 
   useEffect(() => {
-    if (!loading && session) navigate(from, { replace: true })
-  }, [session, loading, navigate, from])
+    if (!loading && session) {
+      const isDefaultTarget = !location.state?.from || location.state?.from?.pathname === '/dashboard' || location.state?.from?.pathname === '/login'
+      if (isDefaultTarget) {
+        if (profile) {
+          navigate(profile.role === 'head' ? '/head-dashboard' : '/member-dashboard', { replace: true })
+        } else {
+          navigate('/dashboard', { replace: true })
+        }
+      } else {
+        navigate(from, { replace: true })
+      }
+    }
+  }, [session, profile, loading, navigate, from, location.state])
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!email.trim() || !password) return
+    if (!loginId.trim() || !password) return
     setSubmitting(true)
     try {
-      await login(email.trim(), password)
+      const res = await login(loginId.trim(), password)
       toast.success('Welcome back!')
-      navigate(from, { replace: true })
+      const isDefaultTarget = !location.state?.from || location.state?.from?.pathname === '/dashboard' || location.state?.from?.pathname === '/login'
+      if (isDefaultTarget) {
+        const target = res?.profile?.role === 'head' ? '/head-dashboard' : '/member-dashboard'
+        navigate(target, { replace: true })
+      } else {
+        navigate(from, { replace: true })
+      }
     } catch (err) {
       toast.error(err.message || 'Invalid credentials')
     } finally {
@@ -132,17 +149,17 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {/* Email */}
+            {/* Login ID */}
             <div>
-              <label className="carbon-label" htmlFor="email">Email Address</label>
+              <label className="carbon-label" htmlFor="loginId">Login ID</label>
               <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="carbon-input"
-                placeholder="you@delta.sjec.ac.in"
-                autoComplete="email"
+                id="loginId"
+                type="text"
+                value={loginId}
+                onChange={e => setLoginId(e.target.value)}
+                className="carbon-input font-mono"
+                placeholder="e.g. DEL0126847"
+                autoComplete="username"
                 required
               />
             </div>
@@ -176,7 +193,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={submitting || !email || !password}
+              disabled={submitting || !loginId || !password}
               className="btn-primary w-full mt-2"
             >
               {submitting ? <Spinner size="sm" /> : (

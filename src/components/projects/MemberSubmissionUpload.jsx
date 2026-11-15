@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { formatFileSize, getFileIcon } from '../../utils/fileHelpers'
 import { Spinner } from '../ui/Spinner'
 import toast from 'react-hot-toast'
-import { UPLOAD_ACCEPT, validateUploadFile } from '../../constants/uploads'
+import { UPLOAD_ACCEPT, validateUploadFileAsync } from '../../constants/uploads'
 
 /**
  * Panel shown to MEMBERS so they can upload their work for a project.
@@ -15,10 +15,10 @@ export function MemberSubmissionUpload({ projectId, userId, onUploaded }) {
   const [uploading, setUploading] = useState(false)
   const inputRef = useRef(null)
 
-  function pickFile(files) {
+  async function pickFile(files) {
     if (!files?.length) return
     const selectedFile = files[0]
-    const validationError = validateUploadFile(selectedFile)
+    const validationError = await validateUploadFileAsync(selectedFile)
     if (validationError) {
       toast.error(validationError)
       return

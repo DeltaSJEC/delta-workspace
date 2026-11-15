@@ -89,12 +89,28 @@ supabase/migrations/005_security_hardening.sql ← RLS, storage, and validation 
 npm run seed
 ```
 
-This creates two test accounts:
+This seeds the club accounts and assigns their portal roles:
 
-| Email | Password | Role | Dept |
-|---|---|---|---|
-| `test_head@delta.sjec.ac.in` | `Delta@2026` | Head | Computing |
-| `test_member@delta.sjec.ac.in` | `Delta@2026` | Member | Mechanical |
+**Heads (Access to Head Portal):**
+| Name | Login ID | Branch | Department | Role / Designation | Portal Role |
+|---|---|---|---|---|---|
+| Shawn Vas | `DEL0126528` | AIML | ICBS | Media Head | Head |
+| Nikhitha HL | `DEL0326419` | ECE | ECE | Vice president of ECE | Head |
+| Jawahar Lawrence Rodrigues | `DEL0326936` | ECE | ECE | President | Head |
+| Norman Daran Dsouza | `DEL0426731` | MECH | MECH | Founder & VP, Mechanical Engineering | Head |
+| Anjali R Rai | `DEL0126473` | AIML | ICBS | Management Head | Head |
+| Melrick Prith Dsouza | `DEL0126839` | AIML | ICBS | Vice president of CSE | Head |
+
+**Members (Access to Member Portal):**
+| Name | Login ID | Branch | Department | Role / Designation | Portal Role |
+|---|---|---|---|---|---|
+| Anish Dsouza | `DEL0126847` | AIML | ICBS | Computing Engineer | Member |
+| Sanmith S Joseph | `DEL0126193` | AIML | ICBS | Computing Engineer | Member |
+| Melria Smitha Gonsalves | `DEL0126385` | AIML | ICBS | Computing Engineer | Member |
+| Vanyashree | `DEL0326164` | ECE | ECE | Electronics Engineer | Member |
+| Anika Chrisal Patrao | `DEL0226592` | CSE | CSE | Digital Systems Engineer | Member |
+| Ananya Amarnath | `DEL0226148` | CSE | CSE | Digital Systems Engineer | Member |
+| Darren Merce Aranha | `DEL0226916` | CSE | CSE | Creative Editor | Member |
 
 ### 5. Start the dev server
 

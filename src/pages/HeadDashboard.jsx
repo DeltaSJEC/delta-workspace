@@ -20,10 +20,10 @@ export default function HeadDashboard() {
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-[#e2e2e2]">
-            Head Panel &nbsp;—&nbsp; <span className="text-[#aec6ff]">{profile?.name}</span>
+            {profile?.role_title || 'Head Panel'} &nbsp;—&nbsp; <span className="text-[#aec6ff]">{profile?.name}</span>
           </h2>
           <p className="text-sm text-[#525252] mt-1">
-            {profile?.is_club_wide ? 'Club-wide · Head' : `${profile?.department} · Head`}
+            {profile?.department}{profile?.branch ? ` (${profile?.branch})` : ''} &nbsp;·&nbsp; {profile?.role_title || 'Head'}
           </p>
         </div>
         <div className="flex items-center gap-3">

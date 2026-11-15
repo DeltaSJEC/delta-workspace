@@ -22,7 +22,7 @@ export default function MemberDashboard() {
           Welcome back, <span className="text-[#aec6ff]">{profile?.name?.split(' ')[0] || 'member'}</span>
         </h2>
         <p className="text-sm text-[#525252] mt-1">
-          {profile?.department} Department &nbsp;·&nbsp; Member
+          {profile?.department}{profile?.branch ? ` (${profile?.branch})` : ''} Department &nbsp;·&nbsp; {profile?.role_title || 'Member'}
         </p>
       </div>
 

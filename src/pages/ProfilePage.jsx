@@ -64,11 +64,14 @@ export default function ProfilePage() {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-[#e2e2e2]">{profile.name}</h3>
-              <p className="text-sm text-[#525252]">{profile.email}</p>
+              <p className="text-sm font-mono text-[#aec6ff] font-medium">ID: {profile.email?.split('@')[0]?.toUpperCase()}</p>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant={profile.role === 'head' ? 'head' : 'member'}>
-                  {profile.role === 'head' ? 'Head' : 'Member'}
+                  {profile.role_title || (profile.role === 'head' ? 'Head' : 'Member')}
                 </Badge>
+                {profile.branch && (
+                  <Badge variant="default">{profile.branch}</Badge>
+                )}
                 {profile.is_club_wide && (
                   <Badge variant="default">Club-wide</Badge>
                 )}
@@ -78,10 +81,12 @@ export default function ProfilePage() {
 
           <dl className="grid grid-cols-2 gap-4">
             {[
+              { label: 'Login ID', value: profile.email?.split('@')[0]?.toUpperCase() },
+              { label: 'Role / Designation', value: profile.role_title || (profile.role === 'head' ? 'Head' : 'Member') },
               { label: 'Department', value: profile.department },
-              { label: 'Role', value: profile.role === 'head' ? 'Head' : 'Member' },
+              { label: 'Branch', value: profile.branch || '—' },
+              { label: 'Access level', value: profile.role === 'head' ? 'Head Portal (Club-wide)' : 'Member Portal' },
               { label: 'Member since', value: formatDate(profile.created_at) },
-              { label: 'Access level', value: profile.is_club_wide ? 'Club-wide' : 'Department' },
             ].map(({ label, value }) => (
               <div key={label}>
                 <dt className="text-xs text-[#424754] mb-1">{label}</dt>

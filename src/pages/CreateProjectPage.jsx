@@ -7,7 +7,7 @@ import { Spinner } from '../components/ui/Spinner'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { buildStoragePath } from '../utils/fileHelpers'
-import { validateUploadFile } from '../constants/uploads'
+import { validateUploadFileAsync } from '../constants/uploads'
 import toast from 'react-hot-toast'
 
 export default function CreateProjectPage() {
@@ -51,7 +51,7 @@ export default function CreateProjectPage() {
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i]
-          const validationError = validateUploadFile(file)
+          const validationError = await validateUploadFileAsync(file)
           if (validationError) throw new Error(`${file.name}: ${validationError}`)
           setUploadProgress(`Uploading ${i + 1}/${files.length}: ${file.name}`)
           const storagePath = buildStoragePath(project.id, file.name)

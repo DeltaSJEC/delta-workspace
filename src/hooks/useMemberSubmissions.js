@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { buildMemberSubmissionPath } from '../utils/fileHelpers'
-import { validateUploadFile } from '../constants/uploads'
+import { validateUploadFileAsync } from '../constants/uploads'
 
 /**
  * Hook for member work submissions on a project.
@@ -51,7 +51,7 @@ export function useMemberSubmissions(projectId) {
   const uploadSubmission = useCallback(async ({ file, note, userId }) => {
     if (!file || !projectId || !userId) return
 
-    const validationError = validateUploadFile(file)
+    const validationError = await validateUploadFileAsync(file)
     if (validationError) return { success: false, error: validationError }
 
     setUploading(true)
