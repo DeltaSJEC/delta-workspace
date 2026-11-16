@@ -89,28 +89,17 @@ supabase/migrations/005_security_hardening.sql ← RLS, storage, and validation 
 npm run seed
 ```
 
-This seeds the club accounts and assigns their portal roles:
+This seeds the pre-configured club accounts and assigns their portal roles (`head` vs `member`).
 
-**Heads (Access to Head Portal):**
-| Name | Login ID | Branch | Department | Role / Designation | Portal Role |
-|---|---|---|---|---|---|
-| Shawn Vas | `DEL0126528` | AIML | ICBS | Media Head | Head |
-| Nikhitha HL | `DEL0326419` | ECE | ECE | Vice president of ECE | Head |
-| Jawahar Lawrence Rodrigues | `DEL0326936` | ECE | ECE | President | Head |
-| Norman Daran Dsouza | `DEL0426731` | MECH | MECH | Founder & VP, Mechanical Engineering | Head |
-| Anjali R Rai | `DEL0126473` | AIML | ICBS | Management Head | Head |
-| Melrick Prith Dsouza | `DEL0126839` | AIML | ICBS | Vice president of CSE | Head |
-
-**Members (Access to Member Portal):**
-| Name | Login ID | Branch | Department | Role / Designation | Portal Role |
-|---|---|---|---|---|---|
-| Anish Dsouza | `DEL0126847` | AIML | ICBS | Computing Engineer | Member |
-| Sanmith S Joseph | `DEL0126193` | AIML | ICBS | Computing Engineer | Member |
-| Melria Smitha Gonsalves | `DEL0126385` | AIML | ICBS | Computing Engineer | Member |
-| Vanyashree | `DEL0326164` | ECE | ECE | Electronics Engineer | Member |
-| Anika Chrisal Patrao | `DEL0226592` | CSE | CSE | Digital Systems Engineer | Member |
-| Ananya Amarnath | `DEL0226148` | CSE | CSE | Digital Systems Engineer | Member |
-| Darren Merce Aranha | `DEL0226916` | CSE | CSE | Creative Editor | Member |
+#### Login ID Format
+Account Login IDs follow the standard Delta club format:
+```
+DEL[DOMAIN][YEAR][NUMBER]
+```
+- `DEL`: Club prefix
+- `[DOMAIN]`: 2-digit domain/department identifier (e.g. `01` = ICBS, `02` = CSE, `03` = ECE, `04` = MECH)
+- `[YEAR]`: 2-digit batch year (e.g. `26` for 2026)
+- `[NUMBER]`: 3-digit member identifier
 
 ### 5. Start the dev server
 
