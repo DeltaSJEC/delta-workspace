@@ -9,6 +9,7 @@ export const ALLOWED_UPLOAD_TYPES = [
   'application/vnd.ms-powerpoint',
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   'application/zip',
+  'application/x-zip-compressed',
   'image/jpeg',
   'image/png',
   'image/gif',
@@ -21,7 +22,41 @@ export const ALLOWED_UPLOAD_TYPES = [
   'audio/wav',
 ]
 
-export const UPLOAD_ACCEPT = ALLOWED_UPLOAD_TYPES.join(',')
+const EXTENSION_MIME_MAP = {
+  '.pdf': 'application/pdf',
+  '.doc': 'application/msword',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.xls': 'application/vnd.ms-excel',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  '.ppt': 'application/vnd.ms-powerpoint',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  '.zip': 'application/zip',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
+  '.txt': 'text/plain',
+  '.csv': 'text/csv',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
+}
+
+export function resolveUploadMimeType(file) {
+  if (!file) return ''
+  if (file.type === 'application/x-zip-compressed') return 'application/zip'
+  if (file.type) return file.type
+  const name = (file.name || '').toLowerCase()
+  const dotIdx = name.lastIndexOf('.')
+  if (dotIdx !== -1) {
+    return EXTENSION_MIME_MAP[name.slice(dotIdx)] || ''
+  }
+  return ''
+}
+
+export const UPLOAD_ACCEPT = [...ALLOWED_UPLOAD_TYPES, ...Object.keys(EXTENSION_MIME_MAP)].join(',')
 
 /**
  * Inspects binary magic bytes to determine file signature.
@@ -114,6 +149,7 @@ export function inspectMagicBytes(bytes) {
       type: 'application/zip',
       allowedMimes: [
         'application/zip',
+        'application/x-zip-compressed',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'application/vnd.openxmlformats-officedocument.presentationml.presentation',
@@ -207,6 +243,15 @@ export function validateFileBytes(bytes, declaredType) {
   return null
 }
 
+function getSyncBytes(file) {
+  if (file.bytes instanceof Uint8Array) return file.bytes
+  if (file.buffer instanceof Uint8Array) return file.buffer
+  if (file.buffer instanceof ArrayBuffer || ArrayBuffer.isView(file.buffer)) {
+    return new Uint8Array(file.buffer)
+  }
+  return null
+}
+
 /**
  * Synchronous basic validation (checks size, empty files, declared type,
  * and if byte buffer is attached, verifies magic bytes).
@@ -215,12 +260,14 @@ export function validateUploadFile(file) {
   if (!file) return 'Choose a file first.'
   if (file.size < 1) return 'Empty files cannot be uploaded.'
   if (file.size > MAX_UPLOAD_SIZE_BYTES) return 'Each file must be 50 MB or smaller.'
-  if (!ALLOWED_UPLOAD_TYPES.includes(file.type)) return 'This file type is not supported.'
+  const effectiveType = resolveUploadMimeType(file)
+  if (!ALLOWED_UPLOAD_TYPES.includes(effectiveType)) return 'This file type is not supported.'
 
-  // If buffer / bytes are present synchronously, validate magic bytes immediately
-  if (file.buffer || file.bytes) {
-    const raw = file.bytes || (file.buffer instanceof Uint8Array ? file.buffer : new Uint8Array(file.buffer))
-    return validateFileBytes(raw.slice(0, 512), file.type)
+  // If synchronous byte buffer is present (e.g. Node Buffer / Uint8Array), validate magic bytes immediately.
+  // Note: Browser Blob/File objects expose a .bytes() method (function), so never treat a function as byte data.
+  const raw = getSyncBytes(file)
+  if (raw) {
+    return validateFileBytes(raw.slice(0, 512), effectiveType)
   }
 
   return null
@@ -234,13 +281,12 @@ export async function validateUploadFileAsync(file) {
   const basicErr = validateUploadFile(file)
   if (basicErr) return basicErr
 
+  const effectiveType = resolveUploadMimeType(file)
   let headerBytes = null
 
-  if (file.bytes instanceof Uint8Array) {
-    headerBytes = file.bytes.slice(0, 512)
-  } else if (file.buffer) {
-    const buf = file.buffer instanceof Uint8Array ? file.buffer : new Uint8Array(file.buffer)
-    headerBytes = buf.slice(0, 512)
+  const syncBytes = getSyncBytes(file)
+  if (syncBytes) {
+    headerBytes = syncBytes.slice(0, 512)
   } else if (typeof file.slice === 'function') {
     try {
       const slice = file.slice(0, 512)
@@ -263,7 +309,7 @@ export async function validateUploadFileAsync(file) {
   }
 
   if (headerBytes && headerBytes.length > 0) {
-    return validateFileBytes(headerBytes, file.type)
+    return validateFileBytes(headerBytes, effectiveType)
   }
 
   return null

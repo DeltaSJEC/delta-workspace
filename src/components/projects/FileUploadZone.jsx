@@ -8,17 +8,24 @@ export function FileUploadZone({ files, onChange }) {
   const inputRef = useRef(null)
 
   async function handleFiles(newFiles) {
-    const list = Array.from(newFiles)
+    const list = Array.from(newFiles || [])
+    if (list.length === 0) return
+
+    const validFiles = []
     for (const file of list) {
       const errorMsg = await validateUploadFileAsync(file)
       if (errorMsg) {
         toast.error(`${file.name}: ${errorMsg}`)
-        return
+      } else {
+        validFiles.push(file)
       }
     }
+
+    if (validFiles.length === 0) return
+
     onChange(prev => {
-      const existing = prev.map(f => f.name)
-      const unique = list.filter(f => !existing.includes(f.name))
+      const existing = new Set(prev.map(f => `${f.name}:${f.size}:${f.lastModified}`))
+      const unique = validFiles.filter(f => !existing.has(`${f.name}:${f.size}:${f.lastModified}`))
       return [...prev, ...unique]
     })
   }
@@ -49,7 +56,11 @@ export function FileUploadZone({ files, onChange }) {
           multiple
           accept={UPLOAD_ACCEPT}
           className="hidden"
-          onChange={e => handleFiles(e.target.files)}
+          onChange={e => {
+            const selected = Array.from(e.target.files || [])
+            e.target.value = ''
+            handleFiles(selected)
+          }}
         />
         <span className="material-symbols-outlined text-[#424754] mb-3 block" style={{ fontSize: 36 }}>
           cloud_upload
@@ -71,6 +82,7 @@ export function FileUploadZone({ files, onChange }) {
                 <p className="text-xs text-[#525252]">{formatFileSize(file.size)}</p>
               </div>
               <button
+                type="button"
                 onClick={() => removeFile(file.name)}
                 className="btn-ghost w-7 h-7 p-0 text-[#fa4d56]"
               >

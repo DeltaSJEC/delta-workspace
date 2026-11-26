@@ -95,7 +95,11 @@ export function MemberSubmissionUpload({ projectId, userId, onUploaded }) {
               type="file"
               accept={UPLOAD_ACCEPT}
               className="hidden"
-              onChange={e => pickFile(e.target.files)}
+              onChange={e => {
+                const selected = Array.from(e.target.files || [])
+                e.target.value = ''
+                pickFile(selected)
+              }}
             />
             <span className="material-symbols-outlined text-[#525252]" style={{ fontSize: '36px' }}>
               cloud_upload

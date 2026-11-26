@@ -98,6 +98,41 @@ test('magic-bytes: detects and rejects disguised executable binaries', async () 
   assert.match(resultSh, /Shell Script/)
 })
 
+test('browser Blob/File with .bytes() method and .slice() validates without TypeError', async () => {
+  const pdfBytes = Buffer.from('%PDF-1.7 test content')
+  const blobLike = new Blob([pdfBytes], { type: 'application/pdf' })
+  // Simulate Chrome/modern Blob.prototype.bytes method
+  if (typeof blobLike.bytes !== 'function') {
+    blobLike.bytes = async () => new Uint8Array(pdfBytes)
+  }
+  const result = await validateUploadFileAsync(blobLike)
+  assert.equal(result, null)
+})
+
+test('accepts Windows zip MIME type and extension fallback for txt/doc/zip', async () => {
+  const zipBytes = Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x14, 0x00, 0x06, 0x00])
+  assert.equal(
+    await validateUploadFileAsync({
+      name: 'archive.zip',
+      size: zipBytes.length,
+      type: 'application/x-zip-compressed',
+      buffer: zipBytes,
+    }),
+    null,
+  )
+
+  const txtBytes = Buffer.from('Hello Delta SJEC')
+  assert.equal(
+    await validateUploadFileAsync({
+      name: 'notes.txt',
+      size: txtBytes.length,
+      type: '',
+      buffer: txtBytes,
+    }),
+    null,
+  )
+})
+
 test('magic-bytes: rejects mismatched content types', async () => {
   // Declaring application/pdf but uploading PNG image bytes
   const pngBytes = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])

@@ -7,7 +7,7 @@ import { Spinner } from '../components/ui/Spinner'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { buildStoragePath } from '../utils/fileHelpers'
-import { validateUploadFileAsync } from '../constants/uploads'
+import { validateUploadFileAsync, resolveUploadMimeType } from '../constants/uploads'
 import toast from 'react-hot-toast'
 
 export default function CreateProjectPage() {
@@ -55,10 +55,11 @@ export default function CreateProjectPage() {
           if (validationError) throw new Error(`${file.name}: ${validationError}`)
           setUploadProgress(`Uploading ${i + 1}/${files.length}: ${file.name}`)
           const storagePath = buildStoragePath(project.id, file.name)
+          const contentType = resolveUploadMimeType(file) || 'application/octet-stream'
 
           const { error: storageErr } = await supabase.storage
             .from('project-files')
-            .upload(storagePath, file)
+            .upload(storagePath, file, { contentType })
 
           if (storageErr) throw new Error(`Failed to upload ${file.name}: ${storageErr.message}`)
 
@@ -66,7 +67,7 @@ export default function CreateProjectPage() {
             project_id: project.id,
             storage_path: storagePath,
             filename: file.name,
-            file_type: file.type || 'application/octet-stream',
+            file_type: contentType,
             size_bytes: file.size,
           })
           if (fileRecordError) {

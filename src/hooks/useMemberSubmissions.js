@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { buildMemberSubmissionPath } from '../utils/fileHelpers'
-import { validateUploadFileAsync } from '../constants/uploads'
+import { validateUploadFileAsync, resolveUploadMimeType } from '../constants/uploads'
 
 /**
  * Hook for member work submissions on a project.
@@ -59,10 +59,11 @@ export function useMemberSubmissions(projectId) {
     try {
       // 1. Upload to storage
       const storagePath = buildMemberSubmissionPath(projectId, userId, file.name)
+      const contentType = resolveUploadMimeType(file) || 'application/octet-stream'
 
       const { error: storageErr } = await supabase.storage
         .from('member-submissions')
-        .upload(storagePath, file, { upsert: false })
+        .upload(storagePath, file, { upsert: false, contentType })
 
       if (storageErr) throw new Error(storageErr.message)
 
@@ -74,7 +75,7 @@ export function useMemberSubmissions(projectId) {
           submitted_by: userId,
           storage_path: storagePath,
           filename: file.name,
-          file_type: file.type,
+          file_type: contentType,
           size_bytes: file.size,
           note: note?.trim() || '',
         })

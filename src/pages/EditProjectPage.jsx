@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { useProject } from '../hooks/useProjects'
 import { buildStoragePath, formatFileSize, getFileIcon } from '../utils/fileHelpers'
-import { validateUploadFileAsync } from '../constants/uploads'
+import { validateUploadFileAsync, resolveUploadMimeType } from '../constants/uploads'
 import toast from 'react-hot-toast'
 
 export default function EditProjectPage() {
@@ -105,17 +105,18 @@ export default function EditProjectPage() {
 
         setUploadProgress(`Uploading ${i + 1}/${newFiles.length}: ${file.name}`)
         const storagePath = buildStoragePath(id, file.name)
+        const contentType = resolveUploadMimeType(file) || 'application/octet-stream'
 
         const { error: storageErr } = await supabase.storage
           .from('project-files')
-          .upload(storagePath, file)
+          .upload(storagePath, file, { contentType })
         if (storageErr) throw new Error(`Failed to upload ${file.name}: ${storageErr.message}`)
 
         const { error: fileRecordErr } = await supabase.from('project_files').insert({
           project_id: id,
           storage_path: storagePath,
           filename: file.name,
-          file_type: file.type || 'application/octet-stream',
+          file_type: contentType,
           size_bytes: file.size,
         })
         if (fileRecordErr) {
