@@ -2,6 +2,7 @@ import { DEPARTMENT_COLORS } from '../../constants/departments'
 import { timeAgo } from '../../utils/dateFormat'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabaseClient'
+import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
 export function AnnouncementCard({ announcement, onDeleted }) {
@@ -44,12 +45,22 @@ export function AnnouncementCard({ announcement, onDeleted }) {
           <h3 className="text-base font-semibold text-[#e2e2e2]">{announcement.title}</h3>
         </div>
         {isHead && isOwner && (
-          <button
-            onClick={handleDelete}
-            className="btn-ghost w-8 h-8 p-0 text-[#fa4d56] hover:bg-[rgba(218,30,40,0.1)] shrink-0"
-          >
-            <span className="material-symbols-outlined text-[16px]">delete</span>
-          </button>
+          <div className="flex items-center gap-1 shrink-0">
+            <Link
+              to={`/announcement/${announcement.id}/edit`}
+              className="btn-ghost w-8 h-8 p-0"
+              title="Edit announcement"
+            >
+              <span className="material-symbols-outlined text-[16px]">edit</span>
+            </Link>
+            <button
+              onClick={handleDelete}
+              className="btn-ghost w-8 h-8 p-0 text-[#fa4d56] hover:bg-[rgba(218,30,40,0.1)]"
+              title="Delete announcement"
+            >
+              <span className="material-symbols-outlined text-[16px]">delete</span>
+            </button>
+          </div>
         )}
       </div>
 

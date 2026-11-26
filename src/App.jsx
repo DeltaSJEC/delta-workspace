@@ -15,6 +15,8 @@ const CreateProjectPage = lazy(() => import('./pages/CreateProjectPage'))
 const CreateAnnouncementPage = lazy(() => import('./pages/CreateAnnouncementPage'))
 const LoginActivityPage = lazy(() => import('./pages/LoginActivityPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const EditProjectPage = lazy(() => import('./pages/EditProjectPage'))
+const EditAnnouncementPage = lazy(() => import('./pages/EditAnnouncementPage'))
 
 // Smart dashboard redirect based on role
 function DashboardRedirect() {
@@ -60,6 +62,12 @@ function AppRoutes() {
       } />
       <Route path="/login-activity" element={
         <ProtectedRoute><HeadOnlyRoute><LoginActivityPage /></HeadOnlyRoute></ProtectedRoute>
+      } />
+      <Route path="/project/:id/edit" element={
+        <ProtectedRoute><HeadOnlyRoute><EditProjectPage /></HeadOnlyRoute></ProtectedRoute>
+      } />
+      <Route path="/announcement/:id/edit" element={
+        <ProtectedRoute><HeadOnlyRoute><EditAnnouncementPage /></HeadOnlyRoute></ProtectedRoute>
       } />
 
       {/* Catch-all */}

@@ -73,7 +73,7 @@ export function ProjectCard({ project, onDeleted }) {
         </div>
         {isHead && isOwner && (
           <div className="flex items-center gap-1 shrink-0">
-            <Link to={`/project/${project.id}`} className="btn-ghost w-8 h-8 p-0">
+            <Link to={`/project/${project.id}/edit`} className="btn-ghost w-8 h-8 p-0" title="Edit project">
               <span className="material-symbols-outlined text-[16px]">edit</span>
             </Link>
             <button

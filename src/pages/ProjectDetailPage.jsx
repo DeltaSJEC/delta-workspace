@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { AppShell } from '../components/layout/AppShell'
 import { ProjectFileList } from '../components/projects/ProjectFileList'
 import { CommentList } from '../components/comments/CommentList'
@@ -13,11 +13,15 @@ import { useAuth } from '../context/AuthContext'
 import { useMemberSubmissions } from '../hooks/useMemberSubmissions'
 import { DEPARTMENT_COLORS } from '../constants/departments'
 import { formatDateTime } from '../utils/dateFormat'
+import { supabase } from '../lib/supabaseClient'
+import toast from 'react-hot-toast'
 
 export default function ProjectDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const { profile, isHead, user } = useAuth()
   const { project, loading, error, refetch } = useProject(id)
+  const [deleting, setDeleting] = useState(false)
   const {
     submissions,
     loading: subsLoading,
@@ -57,14 +61,57 @@ export default function ProjectDetailPage() {
   const targets = project.target_departments || []
   const isOwner = profile?.id === project.posted_by
 
+  async function handleDeleteProject() {
+    if (!confirm('Delete this project? This cannot be undone.')) return
+    setDeleting(true)
+    const storagePaths = project.project_files?.map(file => file.storage_path) || []
+    if (storagePaths.length > 0) {
+      const { error: storageError } = await supabase.storage.from('project-files').remove(storagePaths)
+      if (storageError) {
+        toast.error('Failed to delete project attachments')
+        setDeleting(false)
+        return
+      }
+    }
+    const { error: deleteError } = await supabase.from('projects').delete().eq('id', project.id)
+    if (deleteError) {
+      toast.error('Failed to delete project')
+      setDeleting(false)
+    } else {
+      toast.success('Project deleted')
+      navigate('/dashboard', { replace: true })
+    }
+  }
+
   return (
     <AppShell pageTitle={project.title}>
-      {/* Back */}
-      <div className="mb-5">
+      {/* Back + owner actions */}
+      <div className="mb-5 flex items-center justify-between gap-4">
         <Link to="/dashboard" className="btn-ghost px-0 text-[#525252] hover:text-[#aec6ff]">
           <span className="material-symbols-outlined text-[16px]">arrow_back</span>
           Back to Dashboard
         </Link>
+        {isHead && isOwner && (
+          <div className="flex items-center gap-2">
+            <Link to={`/project/${id}/edit`} className="btn-secondary h-9 px-4 text-sm">
+              <span className="material-symbols-outlined text-[16px]">edit</span>
+              Edit
+            </Link>
+            <button
+              type="button"
+              onClick={handleDeleteProject}
+              disabled={deleting}
+              className="btn-secondary h-9 px-4 text-sm text-[#fa4d56] border-[rgba(218,30,40,0.3)] hover:bg-[rgba(218,30,40,0.1)]"
+            >
+              {deleting ? <Spinner size="sm" /> : (
+                <>
+                  <span className="material-symbols-outlined text-[16px]">delete</span>
+                  Delete
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
